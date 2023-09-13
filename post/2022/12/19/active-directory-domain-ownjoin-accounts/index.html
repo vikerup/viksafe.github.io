@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="viksafe">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="https://viksafe.com//images/bg.png">
+    <meta property="twitter:image" content="https://viksafe.com//images/bg.png" />
+    
+
+    
+    <meta name="title" content="Active Directory domain (own)join accounts" />
+    <meta property="og:title" content="Active Directory domain (own)join accounts" />
+    <meta property="twitter:title" content="Active Directory domain (own)join accounts" />
+    
+
+    
+    <meta name="description" content="">
+    <meta property="og:description" content="" />
+    <meta property="twitter:description" content="" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>Active Directory domain (own)join accounts | </title>
+
+    <link rel="canonical" href="/post/2022/12/19/active-directory-domain-ownjoin-accounts/">
+
+    
+    
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hugo-theme-cleanwhite.min.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+
+    
+    <link rel="stylesheet" href="/css/font-awesome.all.min.css">
+
+    
+    
+
+    
+    <script src="/js/jquery.min.js"></script>
+
+    
+    <script src="/js/bootstrap.min.js"></script>
+
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    <script src="/js/lazysizes.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">viksafe</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">All Posts</a>
+                    </li>
+                    
+                        
+                    
+                    
+		    
+		            <li>
+                        <a href="/search"><i class="fa fa-search"></i></a>
+		           </li>
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/images/bg.png')
+    }
+</style>
+
+<header class="intro-header" >
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1>Active Directory domain (own)join accounts</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        
+                            Posted by 
+                            
+                                    viksafe
+                             
+                            on 
+                            Monday, December 19, 2022
+                            
+                            
+                            
+                            
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <p>There is probably no need for an introduction to Active Directory. Most both small business and large enterprises
+have been using Active Directory since the move from NT 4.0 back in 1999 and probably everyone in the IT industry have had
+the opportunity to both hate and love Active Directory Domain Services.</p>
+<p>As most of the Active Directory instances dates back to early 2000 and the various number of System Administrators that&rsquo;s
+been in charge of the Domain and Domain Controllers makes it hard build a security baseline. Most often the System Administrators
+main purpose is to support an organization or enable growth or scaling, where maybe security actually comes at a second priority.
+Having security as a number one priority will never generate the most revenue, however lacking the security aspect and suffer a breach
+or a ransomware attack can very well break a company. Enough off-topic, on to the technical..</p>
+<h2 id="domain-join">Domain Join</h2>
+<p>For a Windows computer to have a membership with a Active Directory domain it needs to be joined. This is done either via Windows GUI
+or the <code>netdom.exe</code> command. More often this domain join action is done via Microsoft Deployment Toolkit MDT or Microsoft Endpoint Configuration Manager
+(a.k.a SMS, SCCM, CCM) in an automated fashion during operative system deployment.</p>
+<p>To be able to join the domain this action requires a valid username and password for an account the exists in the Active Directory environment.
+It is with high importance that this domain join account is configured with the principal-of-least-privilege as it is widely used in scripts, on servers or
+exposed to the windows client during operative systems deployment.</p>
+<h2 id="domain-join-account-permissions">Domain join account permissions</h2>
+<p>Microsoft has <a href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/access-denied-when-joining-computers">created an article</a> for creating an Active Directory domain join account (“Error: Access is denied when non-administrator users who have been delegated control try to join computers to a domain controller”) but it is difficult to find.</p>
+<p>
+  <img src="/images/domainjoin_msarticle.png" alt="domainjoin_msarticle">
+
+</p>
+<p>The article highlights the specific permissions needed for creating a low-privilege account dedicated to domain join actions. But following these recommendations does not address a subtle, undocumented Active Directory feature which is the topic of this article.
+The Microsoft article recommends the following permissions:</p>
+<p>In Active Directory Users and Computers (ADUC):</p>
+<blockquote>
+<p>Locate and right-click the OU that you want to modify, and then select Delegate Control.</p>
+<ol>
+<li>
+<p>In the Delegation of Control Wizard, select Next.</p>
+</li>
+<li>
+<p>Select Add to add a specific user or a specific group to the Selected users and groups list, and then select Next.</p>
+</li>
+<li>
+<p>In the Tasks to Delegate page, select Create a custom task to delegate, and then select Next.</p>
+</li>
+<li>
+<p>Select Only the following objects in the folder, and then from the list, click to select the Computer objects check box. Then, select the check boxes below the list, Create selected objects in this folder and Delete selected objects in this folder.</p>
+</li>
+<li>
+<p>Select Next.</p>
+</li>
+<li>
+<p>In the Permissions list, click to select the following check boxes:</p>
+</li>
+</ol>
+<ul>
+<li>Reset Password</li>
+<li>Read and write Account Restrictions</li>
+<li>Validated write to DNS host name</li>
+<li>Validated write to service principal name</li>
+</ul>
+</blockquote>
+<h2 id="domain-object-ownership">Domain object ownership</h2>
+<p>Accounts with membership of high privilege groups (Domain Admins, Enterprise Admins etc) in Active Directory are allowed to join unlimited number of
+computers to the domain. A default regular user account with <code>Domain Users</code>
+membership are allowed to join 10 computer to the domain. This
+is set by the <code>ms-DS-MachineAccountQuota</code>.</p>
+<p>An Active Directory <code>object</code> is an entity that represents a resource that is
+present in the Active Directory Domain. This may be a user account, a group,
+a computer, a printer or a folder to name a few. All of these objects need to
+have an owner, this is a permission that gives full control on the object
+without having any specific Access Control List (ACL) on said object. By
+having <code>owner</code> rights on a object you can simply assign yourself
+the <code>Full control</code> ACL.</p>
+<p>If you join a computer to the domain with a high-privileged account or a regular user account the owner of the object will default to
+the <code>Domain Admins</code> group which is completely fine. This means that only high privileged users in the domain can manipulate the computer object.</p>
+<p>
+  <img src="/images/domainjoin_objectowner.png" alt="objectowner">
+
+</p>
+<p>The user account used to join the domain is also assigned the following permissions to the computer object:</p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read</td>
+</tr>
+<tr>
+<td>Allowed to authenticate</td>
+</tr>
+<tr>
+<td>Change password</td>
+</tr>
+<tr>
+<td>Recieve as</td>
+</tr>
+<tr>
+<td>Reset password</td>
+</tr>
+<tr>
+<td>Send as</td>
+</tr>
+<tr>
+<td>Validate write to DNS host name</td>
+</tr>
+<tr>
+<td>Validate write to service principal name</td>
+</tr>
+<tr>
+<td>Read account restriction</td>
+</tr>
+<tr>
+<td>Write accounts restriction</td>
+</tr>
+<tr>
+<td>Read DNS hostname attributes</td>
+</tr>
+<tr>
+<td>Read MS-TSGatwayAccess</td>
+</tr>
+<tr>
+<td>Read personal information</td>
+</tr>
+<tr>
+<td>Read public information</td>
+</tr>
+</tbody>
+</table>
+<p>With these permissions you are allowed to change the computer name via the Validate write to DNS host name if you re-join to the domain with the same account that was used during the initial join. By default, the computer objects are created in the Computers container in the Active Directory if nothing else is specified.</p>
+<p>
+  <img src="/images/domainjoin_container.png" alt="domainjoin_container">
+
+</p>
+<p>However, if you follow <a href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/access-denied-when-joining-computers">Microsoft&rsquo;s instructions</a> and you specifically
+assign the permissions as describe in the article,
+the domain join behaviour will change and the account used to join
+will become the owner of the object, and not <code>Domain Admins</code>.</p>
+<p>
+  <img src="/images/domainjoin_specific.png" alt="domainjoin_specific">
+
+</p>
+<p>And as discussed earlier, the Owner permissions enable full, complete control of the object. This means that, rather than assigning least privilege to the account, we have actually created an account that eventually will be the owner of all computer objects that it has created.</p>
+<h2 id="attack">Attack</h2>
+<p>When having the <code>Owner</code> permission on a object both Resource Based Constrained Delegation (RBCD) and Shadows Credentials attacks are available to compromise the
+targets and gain <code>NT Authority\SYSTEM</code> level permissions. Describing these attacks is out of scope for this article.</p>
+<p>During Active Directory penetration tests, red team engagements or internal network assessments this domain join permission problem is a regular occurrence and 9.9 times
+out of 10 a compromise of this domain join account will lead to full domain compromise by means of lateral movement.</p>
+<h2 id="recommendations">Recommendations</h2>
+<p>The solutions for this problem is quite simple; during Operative System deployment
+automation task run a Powershell script the changes to owner on the object.</p>
+<pre tabindex="0"><code>$comp = Get-ADComputer &lt;COMPUTER&gt;
+$comppath = &#34;AD:$($comp.DistinguishedName.ToString())&#34;
+$acl = Get-Acl -Path $comppath
+$objUser = New-Object System.Security.Principal.NTAccount(&#34;&lt;DOMAIN NETBIOS NAME&gt;&#34;, &#34;Domain Admins&#34;)
+$acl.SetOwner($objUser)
+Set-Acl -Path $comppath -AclObject $acl
+</code></pre><p>Also, make sure that all existing computer accounts have their owner set to Domain Admins.</p>
+<p>This in combination with Microsoft&rsquo;s initial recommendation on permissions will help build more resilience during a possible compromise.
+In addition, Microsoft provides two additional protections to the domain join account however they are located on a <a href="https://docs.microsoft.com/en-us/mem/configmgr/core/plan-design/hierarchy/accounts#task-sequence-domain-join-account">ConfigMgr documentation site</a>:</p>
+<p>• Don&rsquo;t assign interactive sign-in permissions to this account.
+• Don&rsquo;t use the network access account for this account.</p>
+<p>These two permissions help limit lateral movement with the domain join account if it should be compromised. Note that this does not mitigate the problems with object ownership.</p>
+<h2 id="additional-information-dsheuristics">Additional information (dSHeuristics)</h2>
+<p>There is actually <a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/fb7c101d-ec8b-4fbf-bca8-7d7c2d747d0c">a way to deny</a> an Owner of a computer object the rights to gain full control ACL. The dSHeuristics attribute BlockOwnerImplicitRights in Active Directory can be changed to control this behavior. Meager documentation of the impact created by this change exists and more importantly it is unknown how it may affect your environment. It is not recommended to change this attribute unless the full implications are known.</p>
+<h2 id="microsoft">Microsoft</h2>
+<p>Back in October 2021 Andreas Vikerup contacted Microsoft Security Response Center (MSRC) to ask for updates to their recommendations regarding domain join accounts and highlight the undocumented risks of having these specific permissions. This was registered as Case number 68204 and after one month Microsoft responded with:</p>
+<p>”Hello,
+We have completed our investigation and determined that this issue does not meet MSRC&rsquo;s bug bar for a security update.”</p>
+<p>Hopefully this article helps administrators know the risks of using domain join accounts configured with least-privileges and maybe makes Microsoft update their guidelines in this matter. One would also be glad if this documentation was easy to find, and preferably on one site.</p>
+
+
+                
+
+                
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2021/07/26/buying-your-data/" data-toggle="tooltip" data-placement="top" title="Buying your data">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+                
+
+                
+
+
+
+            </div>
+
+            
+            
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+            
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+
+                
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">                  
+                    
+                    <li>
+                        <a href="mailto:contact@viksafe.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fas fa-circle fa-stack-2x"></i>
+                                <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		           
+                    
+                    
+                    
+                    
+
+		            
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/vikerup">
+                            <span class="fa-stack fa-lg">
+                                <i class="fas fa-circle fa-stack-2x"></i>
+                                <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		            
+                    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://linkedin.com/andreas-vikerup-5829b917">
+                            <span class="fa-stack fa-lg">
+                                <i class="fas fa-circle fa-stack-2x"></i>
+                                <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		           
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+           
+             </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; viksafe 2023
+                    <br>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function loadAsync(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        loadAsync("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    loadAsync("https://cdn.jsdelivr.net/npm/fastclick@1.0.6/lib/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        
+        
+        
+        
+            _containerSelector = 'div.post-container'
+        
+
+        
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        
+        $(selector).html('')
+
+        
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    
+
+
+    loadAsync("\/js\/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+
+</body>
+</html>
